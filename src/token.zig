@@ -32,13 +32,13 @@ pub const Token = struct {
         };
     }
 
-    pub fn keyword(identifier: []const u8) ?TokenEnum {
+    pub fn keyword(identifier: []const u8) TokenEnum {
         // todo dumbeldor: try to use comptime here?
         const map = std.StaticStringMap(TokenEnum).initComptime(.{
             .{ "let", TokenEnum.LET },
             .{ "fn", TokenEnum.FUNCTION },
         });
-        return map.get(identifier);
+        return map.get(identifier) orelse TokenEnum.IDENT;
     }
 };
 

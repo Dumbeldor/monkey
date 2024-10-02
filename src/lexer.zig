@@ -34,7 +34,15 @@ const Lexer = struct {
         return self.input[position..self.position];
     }
 
+    fn skipWhitespace(self: *Lexer) void {
+        while (self.ch == ' ' or self.ch == '\t' or self.ch == '\n' or self.ch == '\r') {
+            self.readChar();
+        }
+    }
+
     fn nextToken(self: *Lexer) token.Token {
+        self.skipWhitespace();
+
         const ch = &[_]u8{self.ch};
 
         const t = switch (ch[0]) {
@@ -50,9 +58,7 @@ const Lexer = struct {
             else => {
                 if (utils.isLetter(ch[0])) {
                     const identifier = self.readIdentifier();
-                    if (token.Token.keyword(identifier)) |tok| {
-                        return token.Token.new(tok, identifier);
-                    }
+                    return token.Token.new(token.Token.keyword(identifier), identifier);
                 }
                 return token.Token.new(token.TokenEnum.ILLEGAL, ch);
             },
@@ -84,7 +90,7 @@ test "TestNextTokenSimple" {
 
     for (tests) |t| {
         const to = lexer.nextToken();
-        std.debug.print("{}|{s}\n{}|{s}\n---------\n", .{ t.expectedType, t.expectedLiteral, to.typet, to.literal });
+        //std.debug.print("{}|{s}\n{}|{s}\n---------\n", .{ t.expectedType, t.expectedLiteral, to.typet, to.literal });
         try std.testing.expect(t.expectedType == to.typet);
         try std.testing.expect(std.mem.eql(u8, t.expectedLiteral, to.literal));
     }
@@ -153,13 +159,12 @@ test "TestNextToken" {
         //TestNextTokenStruct{ .expectedType = token.SEMICOLON, .expectedLiteral = ";" },
     };
 
-    const lexer = Lexer.init(input);
-    if (lexer.ch == 0 and tests.len > 0) {}
+    var lexer = Lexer.init(input);
 
-    //for (tests) |t| {
-    //const to = lexer.nextToken();
-    //std.debug.print("{s}|{s}\n{s}|{s}\n---------\n", .{ t.expectedType, t.expectedLiteral, to.typet, to.literal });
-    //try std.testing.expect(std.mem.eql(u8, t.expectedType, to.typet));
-    //try std.testing.expect(std.mem.eql(u8, t.expectedLiteral, to.literal));
-    //}
+    for (tests) |t| {
+        const to = lexer.nextToken();
+        std.debug.print("{}|{s}\n{}|{s}\n---------\n", .{ t.expectedType, t.expectedLiteral, to.typet, to.literal });
+        try std.testing.expect(t.expectedType == to.typet);
+        try std.testing.expect(std.mem.eql(u8, t.expectedLiteral, to.literal));
+    }
 }
