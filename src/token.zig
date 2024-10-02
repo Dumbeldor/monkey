@@ -1,42 +1,62 @@
 const std = @import("std");
-pub const TokenType = []const u8;
+
+pub const TokenEnum = enum {
+    ILLEGAL,
+    EOF,
+    // Identifiers + Literals
+    IDENT,
+    INT,
+    // Operators
+    ASSIGN,
+    PLUS,
+    // Delimiters
+    COMMA,
+    SEMICOLON,
+    LPAREN,
+    RPAREN,
+    LBRACE,
+    RBRACE,
+    // Keywords
+    FUNCTION,
+    LET,
+};
 
 pub const Token = struct {
-    typet: TokenType,
+    typet: TokenEnum,
     literal: []const u8,
 
-    pub fn new(t: TokenType, l: []const u8) Token {
+    pub fn new(t: TokenEnum, l: []const u8) Token {
         return Token{
             .typet = t,
             .literal = l,
         };
     }
 
-    pub fn keyword(identifier: []const u8) ?[]const u8 {
+    pub fn keyword(identifier: []const u8) ?TokenEnum {
         // todo dumbeldor: try to use comptime here?
-        const map = std.StaticStringMap([]const u8).initComptime(.{
-            .{ "let", LET },
-            .{ "fn", FUNCTION },
+        const map = std.StaticStringMap(TokenEnum).initComptime(.{
+            .{ "let", TokenEnum.LET },
+            .{ "fn", TokenEnum.FUNCTION },
         });
         return map.get(identifier);
     }
 };
 
-pub const ILLEGAL = "ILLEGAL";
-pub const EOF = "EOF";
+//pub const ILLEGAL = "ILLEGAL";
+//pub const EOF = "EOF";
 // Identifiers + literals
-pub const IDENT = "IDENT";
-pub const INT = "INT";
+//pub const IDENT = "IDENT";
+//pub const INT = "INT";
 // Operators
-pub const ASSIGN = "=";
-pub const PLUS = "+";
+//pub const ASSIGN = "=";
+//pub const PLUS = "+";
 // Delimiters
-pub const COMMA = ",";
-pub const SEMICOLON = ";";
-pub const LPAREN = "(";
-pub const RPAREN = ")";
-pub const LBRACE = "{";
-pub const RBRACE = "}";
+//pub const COMMA = ",";
+//pub const SEMICOLON = ";";
+//pub const LPAREN = "(";
+//pub const RPAREN = ")";
+//pub const LBRACE = "{";
+//pub const RBRACE = "}";
 // Keywords
-pub const FUNCTION = "FUNCTION";
-pub const LET = "LET";
+//pub const FUNCTION = "FUNCTION";
+//pub const LET = "LET";
