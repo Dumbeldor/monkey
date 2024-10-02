@@ -34,8 +34,17 @@ const Lexer = struct {
         return self.input[position..self.position];
     }
 
+    fn readNumber(self: *Lexer) []const u8 {
+        const position = self.position;
+        while (utils.isNumber(self.ch)) {
+            self.readChar();
+        }
+
+        return self.input[position..self.position];
+    }
+
     fn skipWhitespace(self: *Lexer) void {
-        while (self.ch == ' ' or self.ch == '\t' or self.ch == '\n' or self.ch == '\r') {
+        while (utils.isWhitespace(self.ch)) {
             self.readChar();
         }
     }
@@ -54,6 +63,7 @@ const Lexer = struct {
             ')' => token.Token.new(token.TokenEnum.RPAREN, ch),
             '{' => token.Token.new(token.TokenEnum.LBRACE, ch),
             '}' => token.Token.new(token.TokenEnum.RBRACE, ch),
+            '0'...'9' => return token.Token.new(token.TokenEnum.INT, self.readNumber()),
             0 => token.Token.new(token.TokenEnum.EOF, ""),
             else => {
                 if (utils.isLetter(ch[0])) {
@@ -122,41 +132,41 @@ test "TestNextToken" {
         TestNextTokenStruct{ .expectedType = token.TokenEnum.SEMICOLON, .expectedLiteral = ";" },
 
         // let ten = 10;
-        //TestNextTokenStruct{ .expectedType = token.LET, .expectedLiteral = "let" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "ten" },
-        //TestNextTokenStruct{ .expectedType = token.ASSIGN, .expectedLiteral = "=" },
-        //TestNextTokenStruct{ .expectedType = token.INT, .expectedLiteral = "10" },
-        //TestNextTokenStruct{ .expectedType = token.SEMICOLON, .expectedLiteral = ";" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LET, .expectedLiteral = "let" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "ten" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.ASSIGN, .expectedLiteral = "=" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.INT, .expectedLiteral = "10" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.SEMICOLON, .expectedLiteral = ";" },
         //
         //// let add = fn(x, y) { x + y; };
-        //TestNextTokenStruct{ .expectedType = token.LET, .expectedLiteral = "let" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "add" },
-        //TestNextTokenStruct{ .expectedType = token.ASSIGN, .expectedLiteral = "=" },
-        //TestNextTokenStruct{ .expectedType = token.FUNCTION, .expectedLiteral = "fn" },
-        //TestNextTokenStruct{ .expectedType = token.LPAREN, .expectedLiteral = "(" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "x" },
-        //TestNextTokenStruct{ .expectedType = token.COMMA, .expectedLiteral = "," },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "y" },
-        //TestNextTokenStruct{ .expectedType = token.RPAREN, .expectedLiteral = ")" },
-        //TestNextTokenStruct{ .expectedType = token.LBRACE, .expectedLiteral = "{" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "x" },
-        //TestNextTokenStruct{ .expectedType = token.PLUS, .expectedLiteral = "+" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "y" },
-        //TestNextTokenStruct{ .expectedType = token.SEMICOLON, .expectedLiteral = ";" },
-        //TestNextTokenStruct{ .expectedType = token.RBRACE, .expectedLiteral = "}" },
-        //TestNextTokenStruct{ .expectedType = token.SEMICOLON, .expectedLiteral = ";" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LET, .expectedLiteral = "let" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "add" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.ASSIGN, .expectedLiteral = "=" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.FUNCTION, .expectedLiteral = "fn" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LPAREN, .expectedLiteral = "(" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "x" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.COMMA, .expectedLiteral = "," },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "y" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.RPAREN, .expectedLiteral = ")" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LBRACE, .expectedLiteral = "{" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "x" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.PLUS, .expectedLiteral = "+" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "y" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.SEMICOLON, .expectedLiteral = ";" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.RBRACE, .expectedLiteral = "}" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.SEMICOLON, .expectedLiteral = ";" },
         //
         //// let result = add(five, ten);
-        //TestNextTokenStruct{ .expectedType = token.LET, .expectedLiteral = "let" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "result" },
-        //TestNextTokenStruct{ .expectedType = token.ASSIGN, .expectedLiteral = "=" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "add" },
-        //TestNextTokenStruct{ .expectedType = token.LPAREN, .expectedLiteral = "(" },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "five" },
-        //TestNextTokenStruct{ .expectedType = token.COMMA, .expectedLiteral = "," },
-        //TestNextTokenStruct{ .expectedType = token.IDENT, .expectedLiteral = "ten" },
-        //TestNextTokenStruct{ .expectedType = token.RPAREN, .expectedLiteral = ")" },
-        //TestNextTokenStruct{ .expectedType = token.SEMICOLON, .expectedLiteral = ";" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LET, .expectedLiteral = "let" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "result" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.ASSIGN, .expectedLiteral = "=" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "add" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.LPAREN, .expectedLiteral = "(" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "five" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.COMMA, .expectedLiteral = "," },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.IDENT, .expectedLiteral = "ten" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.RPAREN, .expectedLiteral = ")" },
+        TestNextTokenStruct{ .expectedType = token.TokenEnum.SEMICOLON, .expectedLiteral = ";" },
     };
 
     var lexer = Lexer.init(input);
