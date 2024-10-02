@@ -7,8 +7,14 @@ pub const TokenEnum = enum {
     IDENT,
     INT,
     // Operators
-    ASSIGN,
-    PLUS,
+    ASSIGN, // =
+    PLUS, // +
+    MINUS, // -
+    BANG, // !
+    ASTERISK, // *
+    SLASH, // /
+    LT, // <
+    GT, // >
     // Delimiters
     COMMA,
     SEMICOLON,
